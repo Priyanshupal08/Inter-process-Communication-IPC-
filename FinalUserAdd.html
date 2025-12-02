@@ -3,38 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPC_SIM // KERNEL_OS</title>
+    <title>IPC_SIM // NEBULA_OS</title>
     
-    <!-- Fonts: Inter (UI) and JetBrains Mono (Code) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* --- THEME VARIABLES --- */
+        /* --- NEBULA THEME VARIABLES --- */
         :root {
-            /* Dark Slate Base */
-            --bg-app: #020617;
-            --bg-panel: #0f172a;
-            --bg-surface: #1e293b;
-            
-            /* Borders & Separators */
-            --border-subtle: #334155;
-            --border-active: #475569;
+            /* Critical Fix: Tells browser to render native controls in dark mode */
+            color-scheme: dark;
 
+            /* Backgrounds */
+            --bg-void: #030014;
+            --bg-glass: rgba(20, 20, 35, 0.6);
+            --bg-glass-hover: rgba(255, 255, 255, 0.07);
+            
+            /* Accents */
+            --accent-primary: #8b5cf6; /* Violet */
+            --accent-secondary: #06b6d4; /* Cyan */
+            --accent-root: #f43f5e; /* Rose */
+            --accent-user: #f59e0b; /* Amber */
+            --accent-guest: #10b981; /* Emerald */
+            
+            /* Borders & Glows */
+            --border-light: rgba(255, 255, 255, 0.15);
+            --glow-primary: 0 0 20px rgba(139, 92, 246, 0.3);
+            
             /* Text */
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
 
-            /* Identity Colors */
-            --color-root: #f43f5e;   /* Rose */
-            --color-user: #f59e0b;   /* Amber */
-            --color-guest: #10b981;  /* Emerald */
-            --color-kernel: #6366f1; /* Indigo */
-            --color-wire: rgba(255, 255, 255, 0.15);
-            
-            /* Fonts */
-            --font-ui: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
             --font-code: 'JetBrains Mono', monospace;
         }
 
@@ -42,760 +44,674 @@
 
         body {
             margin: 0; padding: 20px;
-            background-color: var(--bg-app);
-            color: var(--text-primary);
-            font-family: var(--font-ui);
+            background-color: var(--bg-void);
+            color: var(--text-main);
+            font-family: var(--font-body);
             height: 100vh;
-            display: flex; flex-direction: column; gap: 20px;
+            display: flex; flex-direction: column; gap: 24px;
             overflow: hidden;
-            background-image: radial-gradient(#1e293b 1px, transparent 1px);
-            background-size: 24px 24px;
+            background: radial-gradient(circle at 50% 0%, #1e1b4b, #030014 60%);
         }
 
-        /* --- HEADER (Glass Bar) --- */
+        /* --- TOP BAR --- */
         header {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 0 24px;
-            height: 70px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-light);
+            padding: 12px 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
             z-index: 100;
+            margin: 0 20px;
         }
 
-        h1 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 800;
+        .brand {
+            font-family: var(--font-display);
+            font-weight: 700; font-size: 20px;
             letter-spacing: -0.5px;
-            display: flex; align-items: center; gap: 12px;
+            display: flex; align-items: center; gap: 10px;
         }
-        h1 span {
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .status-dot {
-            width: 8px; height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #22c55e;
+        .brand-icon {
+            width: 24px; height: 24px;
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+            border-radius: 6px;
+            box-shadow: var(--glow-primary);
         }
 
-        /* Button Group */
-        .btn-group { display: flex; gap: 8px; }
+        .controls { display: flex; gap: 8px; }
 
-        .icon-btn {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            width: 42px; height: 42px;
+        .btn-icon {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-light);
+            color: var(--text-muted);
+            width: 36px; height: 36px;
             border-radius: 8px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.2s ease;
             display: flex; align-items: center; justify-content: center;
-        }
-        .icon-btn:hover {
-            background: var(--bg-app);
-            color: var(--text-primary);
-            border-color: var(--text-secondary);
-            transform: translateY(-1px);
-        }
-        .reset-btn {
-            background: rgba(244, 63, 94, 0.1);
-            border: 1px solid rgba(244, 63, 94, 0.2);
-            color: var(--color-root);
-            font-size: 12px;
-            font-weight: 700;
-            padding: 0 16px;
-            border-radius: 8px;
-            cursor: pointer;
+            font-size: 16px; cursor: pointer;
             transition: all 0.2s;
-            font-family: var(--font-code);
         }
-        .reset-btn:hover {
-            background: var(--color-root);
-            color: white;
+        .btn-icon:hover {
+            background: var(--bg-glass-hover);
+            color: var(--text-main);
+            border-color: var(--text-main);
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: var(--accent-root);
+            padding: 0 16px; height: 36px;
+            border-radius: 8px;
+            font-family: var(--font-code); font-size: 11px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-reset:hover {
+            background: var(--accent-root); color: white;
             box-shadow: 0 0 15px rgba(244, 63, 94, 0.4);
         }
 
-        /* --- BENTO LAYOUT --- */
+        /* --- MAIN STAGE --- */
         .layout {
             display: grid;
-            grid-template-columns: 1fr 360px;
-            gap: 20px;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+            padding: 0 20px;
             height: 100%;
             min-height: 0;
         }
 
-        /* --- KERNEL SPACE (The Stage) --- */
         .kernel-space {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-subtle);
-            border-radius: 24px;
             position: relative;
+            background: rgba(10, 10, 20, 0.4);
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.8);
         }
 
-        #wire-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0;
-        }
+        #wire-layer { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
 
-        /* ACL Legend Floating Pill */
-        .acl-legend {
-            position: absolute; top: 24px; left: 24px;
-            background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(4px);
-            border: 1px solid var(--border-subtle);
-            padding: 12px 16px;
-            border-radius: 12px;
-            pointer-events: none;
-        }
-        .acl-title {
-            font-family: var(--font-code);
-            font-size: 10px; color: var(--text-secondary);
-            letter-spacing: 1px;
-            font-weight: 700;
-            margin-bottom: 8px; display: block;
-        }
-        .acl-item {
-            display: flex; align-items: center; gap: 8px;
-            font-size: 11px; color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-        .dot { width: 6px; height: 6px; border-radius: 50%; }
-
-        /* --- KERNEL NODE (The Core) --- */
+        /* KERNEL CORE */
         .kernel-node {
-            position: absolute;
-            left: 50%; top: 50%;
+            position: absolute; left: 50%; top: 50%;
             transform: translate(-50%, -50%);
-            width: 220px; height: 160px;
+            width: 240px; height: 160px;
             
-            /* Glass Effect */
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            backdrop-filter: blur(4px);
-            box-shadow: 0 0 40px rgba(99, 102, 241, 0.15);
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.1);
             
             border-radius: 20px;
-            z-index: 5;
+            z-index: 10;
             display: flex; flex-direction: column; align-items: center;
             padding: 12px;
             transition: transform 0.05s;
         }
-
         .kernel-header {
-            font-family: var(--font-code);
-            font-size: 10px; letter-spacing: 1px;
-            color: #a5b4fc;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            font-weight: 700;
+            font-family: var(--font-code); font-size: 10px;
+            color: var(--accent-primary); letter-spacing: 2px; margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
         }
-
         .buffer-container {
             width: 100%; flex-grow: 1;
             background: rgba(0,0,0,0.3);
             border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
             overflow-y: auto;
-            display: flex; flex-direction: column; gap: 4px;
-            padding: 4px;
+            padding: 6px; display: flex; flex-direction: column; gap: 6px;
         }
         .buffer-container::-webkit-scrollbar { width: 0; }
 
-        /* Buffered Message Pill */
         .msg-item {
-            background: var(--bg-surface);
-            color: var(--text-primary);
-            border-left: 3px solid transparent;
-            font-family: var(--font-code);
-            font-size: 10px; padding: 6px;
-            border-radius: 4px;
-            text-align: center;
-            animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; justify-content: space-between; padding: 6px 10px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.05), transparent);
+            border-left: 2px solid #fff;
+            padding: 8px 10px;
+            font-family: var(--font-code); font-size: 10px; color: var(--text-muted);
+            display: flex; justify-content: space-between; align-items: center;
+            border-radius: 0 4px 4px 0;
+            animation: slideIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        @keyframes slideIn { from { transform: translateY(10px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+        .msg-payload { color: #fff; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; }
+        @keyframes slideIn { from { opacity:0; transform: translateX(-10px); } to { opacity:1; transform: translateX(0); } }
 
-        /* --- PROCESS NODES --- */
+        /* PROCESS NODES */
         .node {
             position: absolute;
-            width: 90px; height: 90px;
-            background: var(--bg-panel);
-            border: 2px solid transparent;
+            width: 84px; height: 84px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-light);
             border-radius: 50%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 2;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-            transition: transform 0.2s ease;
+            z-index: 5;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
         }
-        .node:hover { transform: scale(1.05); z-index: 10; }
+        .node:hover { transform: scale(1.1); z-index: 20; border-color: var(--text-main); }
         
-        .node span { font-size: 11px; font-weight: 600; color: var(--text-primary); }
-        .pid { 
-            font-family: var(--font-code);
-            background: rgba(0,0,0,0.5); 
-            color: var(--text-secondary); 
-            padding: 2px 6px; border-radius: 4px;
-            font-size: 9px; margin-top: 4px;
+        .node span { font-family: var(--font-display); font-weight: 500; font-size: 12px; }
+        .pid {
+            font-family: var(--font-code); font-size: 9px;
+            background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 100px;
+            margin-top: 4px; color: var(--text-muted);
         }
 
-        /* Type Styling */
-        .node.root { border-color: var(--color-root); box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); }
-        .node.user { border-color: var(--color-user); box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); }
-        .node.guest { border-color: var(--color-guest); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+        .node.root { border-bottom: 2px solid var(--accent-root); }
+        .node.user { border-bottom: 2px solid var(--accent-user); }
+        .node.guest { border-bottom: 2px solid var(--accent-guest); }
 
-        /* --- SIDEBAR (Control Deck) --- */
-        .sidebar { 
-            display: flex; flex-direction: column; gap: 20px; 
-            height: 100%; min-height: 0;
-        }
+        /* --- SIDEBAR --- */
+        .sidebar { display: flex; flex-direction: column; gap: 20px; height: 100%; min-height: 0; }
 
-        /* Panel Card */
         .panel {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-            flex-shrink: 0;
+            backdrop-filter: blur(10px);
         }
 
-        .panel-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            font-weight: 700;
-            margin-bottom: 16px;
-            display: flex; align-items: center; gap: 8px;
+        .panel-label {
+            font-family: var(--font-code); font-size: 10px; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+            display: block;
         }
-        .panel-title::before { content:''; width:4px; height:4px; background:var(--color-kernel); display:inline-block; border-radius:50%; }
 
-        /* Controls */
-        .control-group { margin-bottom: 16px; }
-        label { font-size: 10px; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 6px; font-family: var(--font-ui); }
+        .input-group { display: flex; gap: 8px; margin-bottom: 20px; }
         
-        select {
-            width: 100%;
-            background: var(--bg-surface);
-            color: var(--text-primary);
-            border: 1px solid var(--border-subtle);
-            padding: 10px;
-            border-radius: 8px;
-            font-family: var(--font-code);
-            font-size: 11px;
-            cursor: pointer;
-            transition: border 0.2s;
-        }
-        select:hover, select:focus { border-color: var(--color-kernel); }
-
-        .spawn-group { display: flex; gap: 8px; }
-        .btn-add {
-            background: var(--color-kernel);
-            color: white; border: none;
-            width: 40px; border-radius: 8px;
-            font-size: 18px; cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-add:hover { background: #4f46e5; }
-
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white; border: none;
-            padding: 12px; border-radius: 8px;
-            font-weight: 600; font-size: 12px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-            transition: transform 0.1s;
-        }
-        .btn-primary:active { transform: scale(0.98); }
-
-        .btn-secondary {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-active);
-            color: var(--text-primary);
-            padding: 12px; border-radius: 8px;
-            font-weight: 600; font-size: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-secondary:hover { background: var(--border-subtle); }
-
-        /* --- TERMINAL --- */
-        .terminal {
-            background: #000; /* Deep black */
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
+        /* --- DROPDOWN FIXES --- */
+        select, input[type="text"] {
             flex-grow: 1;
-            padding: 16px;
-            font-family: var(--font-code);
-            font-size: 11px;
-            overflow-y: auto;
-            min-height: 0;
-            scroll-behavior: smooth;
-            position: relative;
+            background: #0f172a; /* Solid dark background */
+            border: 1px solid var(--border-light);
+            color: var(--text-main);
+            padding: 10px; border-radius: 10px;
+            font-family: var(--font-body); font-size: 12px;
+            cursor: pointer; transition: 0.2s;
+            appearance: none; /* Removes default arrow */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px top 50%;
+            background-size: 8px auto;
         }
-        .terminal::before {
-            content: 'root@kernel:~$ logs --watch';
-            display: block; color: var(--text-secondary);
-            border-bottom: 1px solid #333;
-            padding-bottom: 8px; margin-bottom: 12px;
+        select:hover, input:hover { border-color: var(--accent-primary); }
+        select:focus, input:focus { border-color: var(--accent-primary); outline: none; }
+        
+        /* Specific fix for options */
+        select option {
+            background-color: #0f172a;
+            color: var(--text-main);
+            padding: 10px;
         }
-        
-        .log-entry { margin-bottom: 6px; padding-left: 8px; border-left: 2px solid #333; line-height: 1.4; }
-        .log-entry span { opacity: 0.6; margin-right: 8px; font-size: 10px; }
-        
-        .log-sys { border-left-color: var(--color-kernel); color: #a5b4fc; }
-        .log-err { border-left-color: var(--color-root); color: #fda4af; }
-        .log-success { border-left-color: var(--color-guest); color: #6ee7b7; }
 
-        /* --- ANIMATIONS & PACKETS --- */
+        .btn-add {
+            width: 40px; background: var(--text-main); color: black;
+            border: none; border-radius: 10px; font-size: 20px; cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-add:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+
+        .routing-grid {
+            display: flex; flex-direction: column; gap: 12px;
+            background: rgba(0,0,0,0.2); padding: 16px; border-radius: 16px;
+            border: 1px solid var(--border-light);
+        }
+
+        .btn-action {
+            width: 100%; padding: 12px; border-radius: 10px;
+            font-family: var(--font-display); font-weight: 600; font-size: 13px;
+            cursor: pointer; border: none; transition: 0.2s;
+        }
+        .btn-send {
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+            color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        .btn-send:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5); }
+        
+        .btn-read {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main); border: 1px solid var(--border-light);
+        }
+        .btn-read:hover { background: rgba(255,255,255,0.1); }
+
+        /* TERMINAL */
+        .terminal {
+            flex-grow: 1;
+            background: #000;
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            padding: 16px;
+            font-family: var(--font-code); font-size: 11px;
+            overflow-y: auto; min-height: 0;
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
+        }
+        .log-entry { margin-bottom: 6px; opacity: 0.8; }
+        .log-time { color: var(--text-muted); margin-right: 8px; opacity: 0.5; }
+        .log-sys { color: var(--accent-primary); }
+        .log-err { color: var(--accent-root); }
+        .log-ok { color: var(--accent-guest); }
+
+        /* --- ANIMATIONS --- */
         .packet {
-            position: absolute; width: 28px; height: 28px;
-            background: var(--bg-app);
-            border: 1px solid var(--color-kernel);
-            border-radius: 6px;
-            color: white; display: flex; justify-content: center; align-items: center;
-            font-size: 14px; z-index: 20;
-            box-shadow: 0 0 15px var(--color-kernel);
+            position: absolute; width: 12px; height: 12px;
+            background: #fff; border-radius: 50%;
+            box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-primary);
+            z-index: 100;
         }
         .packet-label {
-            position: absolute; top: -24px; left: 50%; transform: translateX(-50%);
-            background: var(--color-kernel); color: white;
-            font-size: 9px; padding: 2px 6px; border-radius: 4px;
-            white-space: nowrap; font-weight: 700; font-family: var(--font-code);
+            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 4px;
+            font-size: 10px; white-space: nowrap; color: var(--accent-secondary);
+            border: 1px solid var(--accent-secondary); font-family: var(--font-code);
         }
 
         .overlay-icon {
-            position: absolute;
-            left: 50%; top: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 64px;
-            z-index: 50;
-            pointer-events: none;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            font-size: 60px; z-index: 200; pointer-events: none;
+            filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
             animation: popFade 0.8s forwards;
         }
         @keyframes popFade {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -80%) scale(0.8); opacity: 0; }
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            40% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -60%) scale(1); opacity: 0; }
         }
-
-        hr { border: 0; border-top: 1px solid var(--border-subtle); margin: 20px 0; }
+        
+        .legend {
+            position: absolute; bottom: 20px; left: 20px;
+            display: flex; gap: 16px;
+            font-family: var(--font-code); font-size: 10px; color: var(--text-muted);
+            background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 100px;
+            border: 1px solid var(--border-light); pointer-events: none;
+        }
+        .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 4px; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>
-        <div class="status-dot"></div>
-        <span>IPC_SIM</span> // KERNEL
-    </h1>
-    <div class="btn-group">
-        <button class="icon-btn" onclick="sim.undo()" title="Undo (Ctrl+Z)">⎌</button>
-        <button class="icon-btn" onclick="sim.redo()" title="Redo (Ctrl+Y)">↻</button>
-        <button class="reset-btn" onclick="sim.reset()" title="Reset System">REBOOT SYSTEM</button>
+    <header>
+        <div class="brand">
+            <div class="brand-icon"></div>
+            Message Passing IPC
+        </div>
+        <div class="controls">
+            <button class="btn-icon" onclick="sim.undo()" title="Undo (Ctrl+Z)">⎌</button>
+            <button class="btn-icon" onclick="sim.redo()" title="Redo (Ctrl+Y)">↻</button>
+            <div style="width:1px; background:var(--border-light); margin: 0 8px;"></div>
+            <button class="btn-reset" onclick="sim.reset()">SYSTEM REBOOT</button>
+        </div>
+    </header>
+
+    <div class="layout">
+        <div class="kernel-space" id="kernelSpace">
+            <canvas id="wire-layer"></canvas>
+            
+            <div class="kernel-node" id="kernelNode">
+                <div class="kernel-header">KERNEL BUFFER</div>
+                <div class="buffer-container" id="bufferContainer"></div>
+            </div>
+
+            <div class="legend">
+                <span><span class="dot" style="background:var(--accent-root)"></span>ROOT</span>
+                <span><span class="dot" style="background:var(--accent-user)"></span>USER</span>
+                <span><span class="dot" style="background:var(--accent-guest)"></span>GUEST</span>
+            </div>
+        </div>
+
+        <aside class="sidebar">
+            <div class="panel">
+                <span class="panel-label">Process Manager</span>
+                <div class="input-group">
+                    <select id="spawnType">
+                        <option value="root">ROOT (Admin)</option>
+                        <option value="user">USER (Standard)</option>
+                        <option value="guest">GUEST (Restricted)</option>
+                    </select>
+                    <button class="btn-add" onclick="sim.spawn()">+</button>
+                </div>
+
+                <div class="routing-grid">
+                    <span class="panel-label" style="margin:0">Message Routing</span>
+                    
+                    <select id="senderSelect"><option>Select Sender...</option></select>
+                    
+                    <div style="text-align:center; color:var(--border-light); font-size:10px;">▼</div>
+                    
+                    <select id="receiverSelect"><option>Select Receiver...</option></select>
+
+                    <!-- NEW FEATURE: PAYLOAD INPUT -->
+                    <div style="margin-top:4px;">
+                        <input type="text" id="payloadInput" placeholder="Data Payload (e.g., 0xAF3, HELLO)" style="width:100%; font-family:var(--font-code);">
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+                        <button class="btn-action btn-send" onclick="sim.send()">TRANSMIT</button>
+                        <button class="btn-action btn-read" onclick="sim.read()">RECEIVE</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="terminal" id="terminal">
+                <div class="log-entry log-sys"><span class="log-time">[INIT]</span> Nebula Kernel v2.0 Loaded...</div>
+            </div>
+        </aside>
     </div>
-</header>
 
-<div class="layout">
-    <!-- KERNEL SPACE -->
-    <div class="kernel-space" id="kernelSpace">
-        <canvas id="wire-layer"></canvas>
-        
-        <!-- ACL Legend -->
-        <div class="acl-legend">
-            <span class="acl-title">ACCESS CONTROL</span>
-            <div class="acl-item"><div class="dot" style="background:var(--color-root)"></div> ROOT (Full)</div>
-            <div class="acl-item"><div class="dot" style="background:var(--color-user)"></div> USER (Restricted)</div>
-            <div class="acl-item"><div class="dot" style="background:var(--color-guest)"></div> GUEST (Sandbox)</div>
-        </div>
+    <script>
+        class Sim {
+            constructor() {
+                this.procs = [];
+                this.buffer = [];
+                this.pid = 100;
+                this.history = [];
+                this.future = [];
 
-        <!-- Kernel Node -->
-        <div class="kernel-node" id="kernelNode">
-            <div class="kernel-header">KERNEL BUFFER</div>
-            <div class="buffer-container" id="bufferContainer">
-                <div style="opacity:0.4; font-family:var(--font-code); font-size:10px; text-align:center; margin-top:10px;">[BUFFER EMPTY]</div>
-            </div>
-        </div>
-    </div>
+                this.space = document.getElementById('kernelSpace');
+                this.kernel = document.getElementById('kernelNode');
+                this.bufUI = document.getElementById('bufferContainer');
+                this.canvas = document.getElementById('wire-layer');
+                this.ctx = this.canvas.getContext('2d');
+                this.term = document.getElementById('terminal');
 
-    <!-- CONTROL PANEL -->
-    <aside class="sidebar">
-        <div class="panel">
-            <div class="panel-title">Process Manager</div>
-            
-            <div class="spawn-group">
-                <select id="spawnType">
-                    <option value="root">ROOT (Admin)</option>
-                    <option value="user">USER (Standard)</option>
-                    <option value="guest">GUEST (Restricted)</option>
-                </select>
-                <button class="btn-add" onclick="sim.spawn()">+</button>
-            </div>
-            
-            <hr>
+                window.addEventListener('resize', () => this.resize());
+                
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        if (e.key === 'z') { e.preventDefault(); this.undo(); }
+                        if (e.key === 'y') { e.preventDefault(); this.redo(); }
+                    }
+                });
 
-            <div class="panel-title">Message Routing</div>
+                // Initialize Permanent Processes
+                this.spawn('root', 'SYS_ROOT', false);
+                this.spawn('user', 'SYS_USER', false);
+                this.spawn('guest', 'SYS_GUEST', false);
+                this.saveState(); // Base State
 
-            <div class="control-group">
-                <label>SENDER (PID)</label>
-                <select id="senderSelect"></select>
-            </div>
-            
-            <div style="text-align:center; color:var(--text-secondary); margin-bottom:8px;">↓</div>
-
-            <div class="control-group">
-                <label>RECEIVER (PID)</label>
-                <select id="receiverSelect"></select>
-            </div>
-
-            <div class="action-grid">
-                <button class="btn-primary" onclick="sim.send()">SEND MSG</button>
-                <button class="btn-secondary" onclick="sim.read()">READ MSG</button>
-            </div>
-        </div>
-
-        <div class="terminal" id="terminal">
-            <div class="log-entry log-sys"><span>[BOOT]</span> System Kernel Initialized...</div>
-        </div>
-    </aside>
-</div>
-
-<script>
-class Sim {
-    constructor() {
-        this.procs = [];
-        this.buffer = [];
-        this.pid = 100;
-
-        this.history = [];
-        this.future = [];
-
-        this.space = document.getElementById('kernelSpace');
-        this.kernel = document.getElementById('kernelNode');
-        this.bufUI = document.getElementById('bufferContainer');
-        this.canvas = document.getElementById('wire-layer');
-        this.ctx = this.canvas.getContext('2d');
-        this.term = document.getElementById('terminal');
-
-        window.addEventListener('resize', () => this.resize());
-
-        // Shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey || e.metaKey) {
-                if (e.key === 'z') { e.preventDefault(); this.undo(); }
-                if (e.key === 'y') { e.preventDefault(); this.redo(); }
+                this.resize();
+                this.loop();
             }
-        });
 
-        // Initial Permanent Processes (Not tracked in Undo stack to prevent deletion)
-        this.spawn('root', 'ROOT_SYS', false);
-        this.spawn('user', 'USER_WEB', false);
-        this.spawn('guest', 'GUEST_1', false);
-
-        // Base snapshot
-        this.saveState();
-
-        this.resize();
-        this.loop();
-    }
-
-    // --- STATE MGMT ---
-    snapshot() {
-        return {
-            processes: this.procs.map(p => ({
-                id: p.id, name: p.name, type: p.type, x: p.x, y: p.y
-            })),
-            buffer: JSON.parse(JSON.stringify(this.buffer)),
-            pid: this.pid,
-            logHTML: this.term.innerHTML
-        };
-    }
-
-    saveState() {
-        this.history.push(this.snapshot());
-        this.future = [];
-        if (this.history.length > 50) this.history.shift();
-    }
-
-    restoreState(state) {
-        this.pid = state.pid;
-        this.buffer = state.buffer;
-        this.term.innerHTML = state.logHTML;
-        this.term.scrollTop = this.term.scrollHeight;
-
-        // Rebuild Process DOM
-        this.procs.forEach(p => { if (p.el) p.el.remove(); });
-
-        this.procs = state.processes.map(pData => {
-            const el = document.createElement('div');
-            el.className = `node ${pData.type}`;
-            el.innerHTML = `<span>${pData.name}</span><div class="pid">${pData.id}</div>`;
-            this.space.appendChild(el);
-            return {...pData, el};
-        });
-
-        this.placeNodes();
-        this.renderBuf();
-        this.updateUI();
-    }
-
-    undo() {
-        if (this.history.length <= 1) return;
-        const current = this.history.pop();
-        this.future.push(current);
-        const prev = this.history[this.history.length - 1];
-        this.restoreState(prev);
-    }
-
-    redo() {
-        if (this.future.length === 0) return;
-        const next = this.future.pop();
-        this.history.push(next);
-        this.restoreState(next);
-    }
-
-    // --- LOGIC ---
-    spawn(type, name, record = true) {
-        const t = type || document.getElementById('spawnType').value;
-        const n = name || `${t.toUpperCase()}_${this.pid}`;
-        const p = { id: this.pid++, name: n, type: t, el: null, x:0, y:0 };
-
-        const el = document.createElement('div');
-        el.className = `node ${t}`;
-        el.innerHTML = `<span>${n}</span><div class="pid">${p.id}</div>`;
-        this.space.appendChild(el);
-        p.el = el;
-
-        this.procs.push(p);
-        this.placeNodes();
-        this.updateUI();
-        this.log(`Process Spawned: ${n}`, 'sys');
-
-        if (record) this.saveState();
-    }
-
-    placeNodes() {
-        const cx = this.space.clientWidth / 2;
-        const cy = this.space.clientHeight / 2;
-        const r = 240;
-        const count = this.procs.length;
-
-        this.procs.forEach((p, i) => {
-            const ang = Math.PI + (Math.PI * (i + 1) / (count + 1));
-            p.x = cx + Math.cos(ang) * r - 45;
-            p.y = cy + Math.sin(ang) * r * 0.6 - 45;
-            if (p.el) {
-                p.el.style.left = `${p.x}px`;
-                p.el.style.top = `${p.y}px`;
+            // --- STATE ---
+            snapshot() {
+                return {
+                    processes: this.procs.map(p => ({...p, el: null})),
+                    buffer: JSON.parse(JSON.stringify(this.buffer)),
+                    pid: this.pid,
+                    logHTML: this.term.innerHTML
+                };
             }
-        });
-    }
 
-    check(s, r) {
-        if (s.id === r.id) return "Loopback Error";
-        if (s.type === 'root') return true;
-        if (s.type === 'guest') return r.type === 'guest' ? true : "Guest Restricted";
-        if (s.type === 'user') return r.type === 'root' ? "Root Protected" : true;
-        return true;
-    }
+            saveState() {
+                this.history.push(this.snapshot());
+                this.future = [];
+                if(this.history.length > 50) this.history.shift();
+            }
 
-    send() {
-        const sId = parseInt(document.getElementById('senderSelect').value);
-        const rId = parseInt(document.getElementById('receiverSelect').value);
-        if (!sId || !rId) return;
+            restore(state) {
+                this.pid = state.pid;
+                this.buffer = state.buffer;
+                this.term.innerHTML = state.logHTML;
+                this.term.scrollTop = this.term.scrollHeight;
 
-        const s = this.procs.find(p => p.id === sId);
-        const r = this.procs.find(p => p.id === rId);
+                this.procs.forEach(p => p.el && p.el.remove());
+                this.procs = state.processes.map(data => {
+                    const el = document.createElement('div');
+                    el.className = `node ${data.type}`;
+                    el.innerHTML = `<span>${data.name}</span><div class="pid">PID:${data.id}</div>`;
+                    this.space.appendChild(el);
+                    return { ...data, el: el };
+                });
 
-        if (s.id === r.id) {
-            this.triggerError('⛔');
-            this.log(`BLOCKED: Self-message denied`, 'err');
-            return;
-        }
-
-        this.anim(s, 'kernel', `TO: ${r.name}`, () => {
-            const perm = this.check(s, r);
-            if (perm === true) {
-                this.buffer.push({from:sId, to:rId});
+                this.placeNodes();
                 this.renderBuf();
-                this.log(`Buffered: ${s.name} ➝ ${r.name}`, 'success');
+                this.updateUI();
+            }
+
+            undo() {
+                if(this.history.length <= 1) return;
+                const curr = this.history.pop();
+                this.future.push(curr);
+                this.restore(this.history[this.history.length - 1]);
+            }
+
+            redo() {
+                if(this.future.length === 0) return;
+                const next = this.future.pop();
+                this.history.push(next);
+                this.restore(next);
+            }
+
+            // --- LOGIC ---
+            spawn(type, name, save = true) {
+                if(save) this.saveState();
+                const t = type || document.getElementById('spawnType').value;
+                const n = name || `${t.toUpperCase()}_${this.pid}`;
+                const p = { id: this.pid++, name: n, type: t, el: null, x:0, y:0 };
+                
+                const el = document.createElement('div');
+                el.className = `node ${t}`;
+                el.innerHTML = `<span>${n}</span><div class="pid">PID:${p.id}</div>`;
+                this.space.appendChild(el);
+                p.el = el;
+                
+                this.procs.push(p);
+                this.placeNodes();
+                this.updateUI();
+                this.log(`Spawned Process: ${n}`, 'sys');
+            }
+
+            placeNodes() {
+                const cx = this.space.clientWidth / 2;
+                const cy = this.space.clientHeight / 2;
+                const r = 260; // Wider radius for breathing room
+                
+                this.procs.forEach((p, i) => {
+                    const count = this.procs.length;
+                    const angle = Math.PI + (Math.PI * (i + 1) / (count + 1));
+                    p.x = cx + Math.cos(angle) * r - 42; // centered
+                    p.y = cy + Math.sin(angle) * r * 0.6 - 42;
+                    
+                    if(p.el) {
+                        p.el.style.left = `${p.x}px`;
+                        p.el.style.top = `${p.y}px`;
+                    }
+                });
+            }
+
+            check(s, r) {
+                if(s.id === r.id) return "Loopback Error";
+                if(s.type === 'root') return true;
+                if(s.type === 'guest') return r.type === 'guest' ? true : "Guest Restricted";
+                if(s.type === 'user') return r.type === 'root' ? "Root Protected" : true;
+                return true;
+            }
+
+            send() {
+                const sId = parseInt(document.getElementById('senderSelect').value);
+                const rId = parseInt(document.getElementById('receiverSelect').value);
+                let payload = document.getElementById('payloadInput').value.trim();
+                if(!payload) payload = "DATA"; // Default payload if empty
+
+                if(!sId || !rId) return;
+
+                const s = this.procs.find(p => p.id === sId);
+                const r = this.procs.find(p => p.id === rId);
+
+                if(s.id === r.id) { this.err('⛔', 'Loopback blocked'); return; }
+
+                this.anim(s, 'kernel', payload, () => {
+                    const res = this.check(s, r);
+                    if(res === true) {
+                        this.saveState();
+                        this.buffer.push({from:sId, to:rId, payload: payload});
+                        this.renderBuf();
+                        this.log(`Buffered [${payload}] for ${r.name}`, 'ok');
+                    } else {
+                        this.err('⛔', `Blocked: ${res}`);
+                    }
+                });
+            }
+
+            read() {
+                const sId = parseInt(document.getElementById('senderSelect').value);
+                const rId = parseInt(document.getElementById('receiverSelect').value);
+                if(!sId || !rId) return;
+
+                if(sId === rId) { this.err('⛔', 'Loopback blocked'); return; }
+
+                const r = this.procs.find(p => p.id === rId);
+                const idx = this.buffer.findIndex(m => m.to === rId && m.from === sId);
+
+                if(idx === -1) { this.err('📭', 'Buffer Empty / No Msg'); return; }
+
+                // Get payload before removing
+                const msg = this.buffer[idx];
+                
                 this.saveState();
-            } else {
-                this.triggerError('⛔');
-                this.log(`BLOCKED: ${perm}`, 'err');
+                this.buffer.splice(idx, 1);
+                this.renderBuf();
+                
+                this.anim('kernel', r, msg.payload, () => {
+                    this.log(`Received [${msg.payload}] by ${r.name}`, 'ok');
+                });
             }
-        });
-    }
 
-    read() {
-        const sId = parseInt(document.getElementById('senderSelect').value);
-        const rId = parseInt(document.getElementById('receiverSelect').value);
-        if (!sId || !rId) return;
+            err(icon, msg) {
+                const el = document.createElement('div');
+                el.className = 'overlay-icon';
+                el.innerHTML = icon;
+                this.space.appendChild(el);
+                setTimeout(() => el.remove(), 1000);
+                this.log(msg, 'err');
+                
+                // Premium Shake
+                let i = 0;
+                const shake = setInterval(() => {
+                    const off = (i++ % 2 === 0 ? 4 : -4);
+                    this.kernel.style.transform = `translate(calc(-50% + ${off}px), -50%)`;
+                    if(i > 6) {
+                        clearInterval(shake);
+                        this.kernel.style.transform = `translate(-50%, -50%)`;
+                    }
+                }, 30);
+            }
 
-        if (sId === rId) {
-            this.triggerError('⛔');
-            this.log(`ERROR: Cannot read self`, 'err');
-            return;
+            renderBuf() {
+                this.bufUI.innerHTML = '';
+                if(this.buffer.length === 0) return;
+                
+                this.buffer.forEach(m => {
+                    const s = this.procs.find(p => p.id === m.from);
+                    const r = this.procs.find(p => p.id === m.to);
+                    if(s && r) {
+                        const d = document.createElement('div');
+                        d.className = 'msg-item';
+                        const color = r.type==='root'?'var(--accent-root)':r.type==='user'?'var(--accent-user)':'var(--accent-guest)';
+                        d.style.borderLeftColor = color;
+                        d.innerHTML = `<span>${s.name}</span><span>➝</span><span class="msg-payload">${m.payload}</span><span>${r.name}</span>`;
+                        this.bufUI.appendChild(d);
+                    }
+                });
+            }
+
+            anim(from, to, text, cb) {
+                const start = this.getPos(from);
+                const end = this.getPos(to);
+                
+                const p = document.createElement('div');
+                p.className = 'packet';
+                // Truncate text if too long for animation
+                const displayText = text.length > 8 ? text.substring(0,6)+'..' : text;
+                p.innerHTML = `<div class="packet-label">${displayText}</div>`;
+                this.space.appendChild(p);
+
+                const t0 = performance.now();
+                const step = (now) => {
+                    const prog = Math.min((now - t0) / 800, 1);
+                    const ease = prog < .5 ? 2 * prog * prog : -1 + (4 - 2 * prog) * prog;
+                    
+                    const x = start.x + (end.x - start.x) * ease;
+                    const y = start.y + (end.y - start.y) * ease;
+                    
+                    p.style.left = (x - 6) + 'px'; // center 12px
+                    p.style.top = (y - 6) + 'px';
+
+                    if(prog < 1) requestAnimationFrame(step);
+                    else { p.remove(); if(cb) cb(); }
+                };
+                requestAnimationFrame(step);
+            }
+
+            getPos(obj) {
+                if(obj === 'kernel') {
+                    const r = this.kernel.getBoundingClientRect();
+                    const s = this.space.getBoundingClientRect();
+                    return { x: r.left - s.left + r.width/2, y: r.top - s.top + r.height/2 };
+                }
+                return { x: obj.x + 42, y: obj.y + 42 };
+            }
+
+            loop() {
+                this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+                const k = this.getPos('kernel');
+                
+                this.procs.forEach(p => {
+                    const pc = this.getPos(p);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(k.x, k.y);
+                    this.ctx.lineTo(pc.x, pc.y);
+                    
+                    // Premium Gradient Wire attempt using strokeStyle
+                    const grad = this.ctx.createLinearGradient(k.x, k.y, pc.x, pc.y);
+                    grad.addColorStop(0, 'rgba(139, 92, 246, 0.5)');
+                    grad.addColorStop(1, 'rgba(255,255,255,0.05)');
+                    
+                    this.ctx.strokeStyle = grad;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.stroke();
+                });
+                requestAnimationFrame(() => this.loop());
+            }
+
+            updateUI() {
+                const s = document.getElementById('senderSelect');
+                const r = document.getElementById('receiverSelect');
+                const sv = s.value, rv = r.value;
+                s.innerHTML = ''; r.innerHTML = '';
+                
+                this.procs.forEach(p => {
+                    const opt = `<option value="${p.id}">${p.name}</option>`;
+                    s.innerHTML += opt; r.innerHTML += opt;
+                });
+                if(sv) s.value = sv;
+                if(rv) r.value = rv;
+            }
+
+            log(msg, type) {
+                const c = type==='err'?'log-err':type==='ok'?'log-ok':'log-sys';
+                const t = new Date().toLocaleTimeString('en-US',{hour12:false});
+                this.term.insertAdjacentHTML('beforeend', `<div class="log-entry ${c}"><span class="log-time">[${t}]</span> ${msg}</div>`);
+                this.term.scrollTop = this.term.scrollHeight;
+            }
+
+            resize() {
+                this.canvas.width = this.space.clientWidth;
+                this.canvas.height = this.space.clientHeight;
+                this.placeNodes();
+            }
+            
+            reset() { location.reload(); }
         }
 
-        const r = this.procs.find(p => p.id === rId);
-        const idx = this.buffer.findIndex(m => m.to === rId && m.from === sId);
-
-        if (idx === -1) {
-            this.triggerError('📭');
-            this.log(`ERROR: Buffer empty for ${r.name}`, 'err');
-            return;
-        }
-
-        this.buffer.splice(idx, 1);
-        this.renderBuf();
-        this.saveState();
-
-        this.anim('kernel', r, 'DATA', () => {
-            this.log(`Delivered to ${r.name}`, 'success');
-        });
-    }
-
-    // --- VISUALS ---
-    triggerError(icon) {
-        const el = document.createElement('div');
-        el.className = 'overlay-icon';
-        el.innerHTML = icon;
-        this.space.appendChild(el);
-        setTimeout(() => el.remove(), 1000);
-
-        // Kernel Shake
-        let i = 0;
-        const shake = setInterval(() => {
-            const offsetX = (i % 2 === 0 ? 4 : -4);
-            this.kernel.style.transform = `translate(calc(-50% + ${offsetX}px), -50%)`;
-            i++;
-            if (i > 6) {
-                clearInterval(shake);
-                this.kernel.style.transform = `translate(-50%, -50%)`;
-            }
-        }, 40);
-    }
-
-    renderBuf() {
-        this.bufUI.innerHTML = '';
-        if (this.buffer.length === 0) {
-            this.bufUI.innerHTML = '<div style="opacity:0.4; font-family:var(--font-code); font-size:10px; text-align:center; margin-top:10px;">[BUFFER EMPTY]</div>';
-            return;
-        }
-        this.buffer.forEach(m => {
-            const s = this.procs.find(p => p.id === m.from);
-            const r = this.procs.find(p => p.id === m.to);
-            if (s && r) {
-                const d = document.createElement('div');
-                d.className = 'msg-item';
-                d.innerHTML = `<span>${s.name}</span> <span>→</span> <span>${r.name}</span>`;
-                // Border color based on destination
-                const color = r.type === 'root' ? 'var(--color-root)' : r.type === 'user' ? 'var(--color-user)' : 'var(--color-guest)';
-                d.style.borderLeftColor = color;
-                this.bufUI.appendChild(d);
-            }
-        });
-    }
-
-    anim(from, to, text, cb) {
-        const start = this.getPos(from);
-        const end = this.getPos(to);
-
-        const p = document.createElement('div');
-        p.className = 'packet';
-        p.innerHTML = '✉<div class="packet-label">'+text+'</div>';
-        this.space.appendChild(p);
-
-        const dur = 800;
-        const t0 = performance.now();
-
-        const step = (now) => {
-            const prog = Math.min((now - t0)/dur, 1);
-            const ease = prog < .5 ? 2*prog*prog : -1+(4-2*prog)*prog;
-
-            const x = start.x + (end.x - start.x) * ease;
-            const y = start.y + (end.y - start.y) * ease;
-
-            p.style.left = (x-14)+'px';
-            p.style.top = (y-14)+'px';
-
-            if (prog < 1) requestAnimationFrame(step);
-            else {
-                p.remove();
-                if (cb) cb();
-            }
-        };
-        requestAnimationFrame(step);
-    }
-
-    getPos(obj) {
-        if (obj === 'kernel') {
-            const r = this.kernel.getBoundingClientRect();
-            const s = this.space.getBoundingClientRect();
-            return { x: r.left - s.left + r.width/2, y: r.top - s.top + r.height/2 };
-        }
-        return { x: obj.x + 45, y: obj.y + 45 };
-    }
-
-    loop() {
-        this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
-        const k = this.getPos('kernel');
-
-        this.procs.forEach(p => {
-            const pc = this.getPos(p);
-            this.ctx.beginPath();
-            this.ctx.moveTo(k.x, k.y);
-            this.ctx.lineTo(pc.x, pc.y);
-            this.ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-            this.ctx.lineWidth = 2;
-            this.ctx.stroke();
-        });
-        requestAnimationFrame(() => this.loop());
-    }
-
-    updateUI() {
-        const s = document.getElementById('senderSelect');
-        const r = document.getElementById('receiverSelect');
-        const sV = s.value; const rV = r.value;
-        s.innerHTML=''; r.innerHTML='';
-        this.procs.forEach(p => {
-            const opt = `<option value="${p.id}">${p.name}</option>`;
-            s.innerHTML+=opt; r.innerHTML+=opt;
-        });
-        if (sV) s.value = sV;
-        if (rV) r.value = rV;
-    }
-
-    log(msg, type) {
-        const c = type==='err'?'log-err':type==='success'?'log-success':'log-sys';
-        const time = new Date().toLocaleTimeString('en-US', {hour12:false});
-        this.term.insertAdjacentHTML('beforeend', `<div class="log-entry ${c}"><span>[${time}]</span> ${msg}</div>`);
-        this.term.scrollTop = this.term.scrollHeight;
-    }
-
-    resize() {
-        this.canvas.width = this.space.clientWidth;
-        this.canvas.height = this.space.clientHeight;
-        this.placeNodes();
-    }
-
-    reset() { location.reload(); }
-}
-
-const sim = new Sim();
-</script>
+        const sim = new Sim();
+    </script>
 </body>
 </html>
